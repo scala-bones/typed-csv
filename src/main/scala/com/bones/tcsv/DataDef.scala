@@ -1,19 +1,5 @@
 package com.bones.tcsv
 
-/**
-* Used to confirm that all items in a Tuple are of type DataDef[_].
-* This is somewhat iquivelant to Tuple.IsMappedBy, however is MappedBy only 
-* works if all subtypes are downcast to the base type DataDef[_].  This
-* work in the case where we keep the subtypes, eg (StringDef, IntDef) will
-* match.
-*/
-type AllDataDefs[T <: Tuple] = T match {
-    case EmptyTuple => DummyImplicit
-    case DataDef[_] *: t => AllDataDefs[t]
-    case _ => Nothing
-}
-
-
 sealed trait DataDef[A] 
 case class StringDef(index: Int) extends DataDef[String]    
 case class IntDef(index: Int) extends DataDef[Int]

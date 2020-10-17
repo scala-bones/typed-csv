@@ -35,6 +35,12 @@ class VectorInterpreterTest {
         val result = VectorInterpreter.extractDefList(list)(RowValues(Vector("zero", "one")))
         assertEquals(result, Left((ErrorMessage("Value zero could not be converted to an Int"), List(ErrorMessage("Value one could not be converted to an Int")))))
     }
+    @Test def testOutOfBounds(): Unit = {
+        val list = Cons(IntDef(0), Cons(IntDef(1), EmptyList))
+        val result = VectorInterpreter.extractDefList(list)(RowValues(Vector("0")))
+        assertEquals(result, Left((ErrorMessage("Index 1 is out of bounds, the Vector is of length: 1"), List.empty)))
+
+    }
     @Test def testMap(): Unit = {
         case class Person(name: String, age: Int)
         val list = Cons(StringDef(0), Cons(IntDef(1), EmptyList))
@@ -48,7 +54,7 @@ class VectorInterpreterTest {
         val list = Cons(StringDef(0), Cons(IntDef(1), EmptyList))
         val map = MapDef( (Person.apply _).tupled, ListDef(list))
 
-        val stream = Stream.continually(RowValues(Vector("George Carlin", "42")))
+        val stream = LazyList.continually(RowValues(Vector("George Carlin", "42")))
         val f = VectorInterpreter.extract(map)
 
         stream.take(10000000).zipWithIndex.foreach( vi => { f(vi._1); println(vi._2)} )
