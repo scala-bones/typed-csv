@@ -42,5 +42,16 @@ class VectorInterpreterTest {
         val result = VectorInterpreter.extract(map)(RowValues(Vector("George Carlin", "42")))
         assertEquals(result, Right(Person("George Carlin", 42)))
     }
+    // @Test 
+    def loadTest(): Unit = {
+        case class Person(name: String, age: Int)
+        val list = Cons(StringDef(0), Cons(IntDef(1), EmptyList))
+        val map = MapDef( (Person.apply _).tupled, ListDef(list))
+
+        val stream = Stream.continually(RowValues(Vector("George Carlin", "42")))
+        val f = VectorInterpreter.extract(map)
+
+        stream.take(10000000).zipWithIndex.foreach( vi => { f(vi._1); println(vi._2)} )
+    }
 
 }
