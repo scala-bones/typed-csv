@@ -20,9 +20,16 @@ def ap2[A,B,C](r1: Either[Errors,A], r2: Either[Errors,B], f: (A,B) => C): Eithe
 }
 
 
+
 case class RowValues(row: Vector[String]) extends AnyVal
 
 object VectorInterpreter {
+
+    extension(v: Vector[String]):
+        def getOrError(index: Int): Either[Errors,String] = {
+            if (index < v.length) Right(v(index))
+            else Left( (ErrorMessage(s"Index ${index} is out of bounds, the Vector is of length: ${v.length}"), List.empty) )
+        }
 
     def extract[A](dataDef: DataDef[A]): RowValues => Either[Errors, A] = {
         dataDef match {
@@ -68,14 +75,15 @@ object VectorInterpreter {
     }
 
     def extractString(strDef: StringDef): RowValues => Either[Errors, String] =
-            line => Right(line.row(strDef.index))
+            line => line.row.getOrError(strDef.index)
     
     def extractInt(intDef: IntDef): RowValues => Either[Errors, Int] =
             line => {
-                val input = line.row(intDef.index)
-                Try {  input.toInt }
-                    .toEither.left
-                    .map(ex => { error(s"Value ${input} could not be converted to an Int") })
+                line.row.getOrError(intDef.index).flatMap(str => {
+                    Try {  str.toInt }
+                        .toEither.left
+                        .map(ex => { error(s"Value ${str} could not be converted to an Int") })
+                })                
             }
 }
 
