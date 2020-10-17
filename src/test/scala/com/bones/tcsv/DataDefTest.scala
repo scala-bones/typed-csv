@@ -9,39 +9,37 @@ class DataDefTest {
 
 
     @Test def buildDataStrcutre(): Unit = {
-        case class Person(name: String, age: Int, weight: BigDecimal)
+        case class Person(name: String, age: Int)
 
-        val basePerson = (string("Name"), int("Age"), bigDecimal("Weight"))
+        val basePerson = string(0) :: int(1) :: dnil
 
         val fPerson = (Person.apply _).tupled
-        val personDef = combine( fPerson, basePerson)
+        val personDef = combine( fPerson, ListDef(basePerson))
 
         personDef match {
-            case Combine(f, defs) => {
-                assertEquals(defs.head, string("Name"))
-                assertEquals(defs.tail.head, int("Age"))
-                assertEquals(defs.tail.tail.head, bigDecimal("Weight"))
-                // defs.tail.tail.tail.head // <-- fails to compile as expected
+            case MapDef(f, ListDef(Cons(head, Cons(tail, EmptyList)))) => {
+                assertEquals(head, string(0))
+                assertEquals(tail, int(1))
             }
+            case x => fail(s"Not a match: ${x}")
         }
 
-        val personWithId = ( int("id"),personDef )
+        val personWithId = int(2) :: personDef :: dnil
 
-        val baseTrait = (string("HairColor"), bigDecimal("ShoeSize"))
+        val baseTrait = string(3) :: int(4) :: dnil
 
         val personAndTrait = personWithId ++ baseTrait
 
-        val expectedPersonAndTrait = 
-            (IntDef("id"), 
-                Combine(fPerson, (StringDef("Name"), IntDef("Age"), BigDecimalDef("Weight"))), 
-                StringDef("HairColor"), 
-                BigDecimalDef("ShoeSize")
-            )
-        assertEquals( personAndTrait, expectedPersonAndTrait)
-
-        def isEquivalent[A<:Tuple, B<:Tuple](using A =:= B) = true        
-        assertTrue( isEquivalent[Tuple.InverseMap[expectedPersonAndTrait.type,DataDef],(Int, Person, String, BigDecimal)] )
-
+        personAndTrait match {
+            case PlusPlus(Cons(int2, Cons(MapDef(f, ListDef(Cons(head, Cons(tail, EmptyList)))), EmptyList)), Cons(str3, Cons(int4, EmptyList))) => {
+                assertEquals(head, string(0))
+                assertEquals(tail, int(1))
+                assertEquals(int2, int(2))
+                assertEquals(str3, string(3))
+                assertEquals(int4, int(4))
+            }
+            case x => fail(s"Not a PlusPlus: ${x}")
+        }     
     }
 }
 
