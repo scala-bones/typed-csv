@@ -5,6 +5,10 @@ import org.junit.Assert._
 import com.bones.tcsv.syntax._
 import com.bones.tcsv._
 
+import org.junit.Test
+import org.junit.Assert._
+
+
 class DataDefTest {
 
 
