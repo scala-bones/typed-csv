@@ -4,6 +4,8 @@ import org.junit.Test
 import org.junit.Assert._
 import com.bones.tcsv.syntax._
 import com.bones.tcsv._
+import com.bones.tcsv.DataDef._
+import com.bones.tcsv.DataList._
 
 class VectorInterpreterTest {
 
