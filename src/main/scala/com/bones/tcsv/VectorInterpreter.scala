@@ -23,10 +23,10 @@ object VectorInterpreter {
 
     def extractDefList[T<:Tuple](dataList: DataList[T]): RowValues => Either[Errors,T] = {
         dataList match {
-            case EmptyList => row => Right(EmptyTuple.asInstanceOf[T])
-            case Cons(a, tail) => {
-                val headF = extract(a)
-                val tailF = extractDefList(tail)
+            case EmptyList => row => Right(EmptyTuple)
+            case c: Cons[a,t] => {
+                val headF: RowValues => Either[Errors,a] = extract(c.dataDef)
+                val tailF: RowValues => Either[Errors,t] = extractDefList(c.tail)
                 row => {
                     val headResult = headF(row) 
                     val tailResult = tailF(row)
@@ -45,7 +45,7 @@ object VectorInterpreter {
         }
     }    
 
-    def extractMap[I,B](map: MapDef[I,B]): RowValues => Either[Errors, B] = {
+    def extractMap[A,B](map: MapDef[A,B]): RowValues => Either[Errors, B] = {
         val fMap = extract(map.dataDef)
         row => fMap(row).map(map.f)
     }

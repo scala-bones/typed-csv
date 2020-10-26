@@ -16,7 +16,6 @@ class DataDefTest {
         case class Person(name: String, age: Int)
 
         val basePerson = string(0) :: int(1) :: dnil
-
         val fPerson = (Person.apply _).tupled
         val personDef = combine( fPerson, ListDef(basePerson))
 
