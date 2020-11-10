@@ -18,9 +18,16 @@ def ap2[A,B,C](r1: Either[Errors,A], r2: Either[Errors,B], f: (A,B) => C): Eithe
     }
 }
 
-extension(v: Vector[String]):
-    def getOrError(index: Int): Either[Errors,String] = {
-        if (index < v.length) Right(v(index))
-        else Left( (ErrorMessage(s"Index ${index} is out of bounds, the Vector is of length: ${v.length}"), List.empty) )
+extension(errors: Errors) :
+//    def :: (head: String) : Errors = {
+//        ErrorMessage(head) :: errors
+//    }
+    def :: (head: ErrorMessage) : Errors = {
+        (head,  errors._1 :: errors._2)
     }
+    def ::: (e1: Errors) : Errors = {
+        (e1._1, e1._2 ::: errors._1 :: errors._2)
+    }    
 
+
+    

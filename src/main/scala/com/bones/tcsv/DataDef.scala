@@ -5,13 +5,11 @@ enum DataDef[A] {
     case IntDef(index: Int) extends DataDef[Int]
     case PureDef[A](a: A) extends DataDef[A]
 /**
-    * @tparam T This should be a tuple of DataDef[_]
-    * @tparam I This represends the InverseMap of the tuple.  For example if we have a tuple
-    *              (StringDef("Name"), IntDef("Age")) , this is equivelant to (DataDef[String], DataDef[Int])
-    *              and the InverseMap of this in the context of DataDef is (String,Int)
+    * @tparam I This represends the Input type of the Function.  This can either be a specific type
+    *   such a `String` or it could be a Tuple of Types such as (String,Int)
     * @tparam B This is our expected result type after combining the inputs, eg: Person ( case class Person(name: String, age: Int))
-    * @param f A function responsible for converting the InverseMap of T into the result type, eg: (String,Int) => Person
-    * @param dataDefs A tuple of DataDefs, eg: (StringDef("Name"), IntDef("Age"))
+    * @param f A function responsible for converting I to B with no side affects.
+    * @param dataDefs The definition for the I type.
     */ 
     case MapDef[I,B](
         f: I => B, 
@@ -58,6 +56,6 @@ object syntax {
     */
     def combine[T<:Tuple,B](f: T => B, t: DataDef[T]): DataDef[B] = DataDef.MapDef(f, t)
 
-}
 
+}
 
